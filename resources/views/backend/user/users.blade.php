@@ -18,7 +18,7 @@
                 </div>
             @endif
 
-            <a href="#" class="inline-fl
+            <a href="{{route('users.create')}}" class="inline-fl
 
             ex items-center px-4 py-2 bg-blue-600 text-white rounded-md shadow-sm hover:bg-blue-700 transition">
                 Add User
@@ -26,7 +26,7 @@
         </header>
         <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
             <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-gray-200">
+                <table id="myTable" class="display min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-100">
                     <tr>
                         <th scope="col" class="px-4 py-3 text-left text-sm font-medium text-gray-600">ID</th>
@@ -42,16 +42,20 @@
                         <?php foreach($users as $user) : ?>
                     <tr class="hover:bg-gray-50 transition">
                         <td class="px-4 py-3 text-sm text-gray-700"><?php echo $user->id; ?></td>
-                        <td class="px-4 py-3 text-sm text-gray-700"><?php echo "photo"?></td>
+                        <td class="px-4 py-3 text-sm text-gray-700"><img width="50px" src="https://img.freepik.com/free-vector/blue-circle-with-white-user_78370-4707.jpg?semt=ais_hybrid&w=740"/></td>
                         <td class="px-4 py-3 text-sm text-gray-700"><?php echo $user->name; ?></td>
                         <td class="px-4 py-3 text-sm text-gray-700"><?php echo $user->email; ?></td>
                         <td class="px-4 py-3 text-sm text-gray-500"><?php echo date('d M Y', strtotime($user->created_at)); ?></td>
-                        <td class="px-4 py-3 text-sm">
-                            <div class="flex space-x-2">
-                                <a href="#" class="text-blue-600 hover:text-blue-800">Edit</a>
+                        <td class="px-4 py-3 text-sm px-[10px]">
+                            <div class="flex space-x-4">
+                                <form action="{{route('users.edit', $user->id)}}" method="GET" class="inline">
+                                    @csrf
+                                    @method('GET')
+                                    <button type="submit"  class="btn btn-info text-red-50">Edit</button>
+                                </form>
                                 <!---------Delete user with session message --------->
                                 @if($user->id !== 1 && $user->id !== auth()->user()->id)
-                                    <form action="{{ url('users/' . $user->id) }}" method="POST" class="inline">
+                                    <form action="{{route('users.delete', $user->id)}}" method="POST" class="inline">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="btn btn-danger">Delete</button>

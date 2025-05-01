@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 use App\Models\User;
-
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 
 class UserController extends Controller
@@ -16,12 +16,50 @@ class UserController extends Controller
         return view('/backend.user.users', ['users' => $users]);
     }
 
+
+    // Create New user
+    public function create()
+    {
+        // Return the view for creating a new user
+        return view('/backend.user.create');
+    }
+
+    public function store(Request $request)
+    {
+        // Manual validation with custom message
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255|unique:users,email',
+            'password' => 'required|string|min:8|confirmed',
+            'photo' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+        ], [
+            'email.unique' => 'User already exists.', // 👈 your custom message
+        ]);
+
+        // Redirect back with errors if validation fails
+        if ($validator->fails()) {
+            return redirect()->back()
+                ->withErrors($validator)
+                ->withInput();
+        }
+
+        // Create and save the user
+        $user = new User();
+        $user->name = $request->input('name');
+        $user->email = $request->input('email');
+        $user->password = bcrypt($request->input('password'));
+        $user->save();
+
+        return redirect()->route('users.list')->with('success', 'User created successfully.');
+    }
+
+
+
     // User Delete
     public function delete($id)
     {
         // Find the user by ID
         $user = User::find($id);
-
         // Check if user exists
         if ($user) {
             // Delete the user
@@ -31,5 +69,44 @@ class UserController extends Controller
             return redirect()->back()->with('error', 'User not found.');
         }
     }
+    // User Edit
+    public function edit($id)
+    {
+        // Find the user by ID
+        $user = User::find($id);
+        // Check if user exists
+        if ($user) {
+            // Return the view with the user data
+            return view('/backend.user.edit', ['user' => $user]);
+        } else {
+            return redirect()->back()->with('error', 'User not found.');
+        }
+    }
+
+    // User Update
+    public function update(Request $request, $id)
+    {
+        // Validate input
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
+            'photo' => 'nullable|image|mimes:jpg,jpeg,png|max:2048', // optional
+        ]);
+
+        // Find the user
+        $user = User::find($id);
+        if (!$user) {
+            return redirect()->back()->with('error', 'User not found.');
+        }
+
+        // Update user data
+        $user->name = $request->input('name');
+        $user->email = $request->input('email');
+
+
+        $user->save();
+        return redirect()->route('users.list')->with('success', 'User updated successfully.');
+    }
+
 
 }
