@@ -2,28 +2,49 @@
 
 namespace App\Http\Controllers;
 use App\Models\User;
+use App\Models\UserRole;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 
 class UserController extends Controller
 {
+
+    /**
+     * List of users.
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View|\Illuminate\Foundation\Application
+     */
     public function users()
     {
+
+        // Skip query where has role_id = 1 and logged user.
+
         // Fetch all users from the database
-        $users = User::all();
+        $query = User::where('id', '!=', auth()->user()->id)->get();
+
+        if (auth()->user()->role_id != UserRole::SUPER_ADMIN_ROLE) {
+            $query = $query->where('role_id', '!=', UserRole::SUPER_ADMIN_ROLE);
+        }
 
         // Return the view with the users data
-        return view('/backend.user.users', ['users' => $users]);
+        return view('/backend.user.users', ['users' => $query]);
     }
 
 
-    // Create New user
+    /**
+     * Create a new user.
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View|\Illuminate\Foundation\Application
+     */
     public function create()
     {
         // Return the view for creating a new user
         return view('/backend.user.create');
     }
 
+    /***
+     * Store a new user.
+     * @param Request $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function store(Request $request)
     {
         // Manual validation with custom message
