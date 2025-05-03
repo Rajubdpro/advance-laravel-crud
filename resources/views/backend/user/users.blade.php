@@ -30,6 +30,7 @@
                     <thead class="bg-gray-100">
                     <tr>
                         <th scope="col" class="px-4 py-3 text-left text-sm font-medium text-gray-600">ID</th>
+                        <th scope="col" class="px-4 py-3 text-left text-sm font-medium text-gray-600">Role Id</th>
                         <th scope="col" class="px-4 py-3 text-left text-sm font-medium text-gray-600">Photo</th>
                         <th scope="col" class="px-4 py-3 text-left text-sm font-medium text-gray-600">Name</th>
                         <th scope="col" class="px-4 py-3 text-left text-sm font-medium text-gray-600">Email</th>
@@ -39,9 +40,13 @@
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
                     <?php if(count($users) > 0): ?>
+                    <?php $count = 0;?>
                         <?php foreach($users as $user) : ?>
+                    <?php $count++; ?>
+
                     <tr class="hover:bg-gray-50 transition">
-                        <td class="px-4 py-3 text-sm text-gray-700"><?php echo $user->id; ?></td>
+                        <td class="px-4 py-3 text-sm text-gray-700">{{$count}}</td>
+                        <td class="px-4 py-3 text-sm text-gray-700">{{$user->user_role->name ?? 'N/A'}}</td>
                         <td class="px-4 py-3 text-sm text-gray-700"><img width="50px" src="https://img.freepik.com/free-vector/blue-circle-with-white-user_78370-4707.jpg?semt=ais_hybrid&w=740"/></td>
                         <td class="px-4 py-3 text-sm text-gray-700"><?php echo $user->name; ?></td>
                         <td class="px-4 py-3 text-sm text-gray-700"><?php echo $user->email; ?></td>

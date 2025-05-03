@@ -15,19 +15,25 @@ class UserController extends Controller
      */
     public function users()
     {
+        // Start building the query
+        $query = User::with('user_role:id,name')->where('id', '!=', auth()->user()->id);
 
-        // Skip query where has role_id = 1 and logged user.
-
-        // Fetch all users from the database
-        $query = User::where('id', '!=', auth()->user()->id)->get();
-
+        // Exclude super admins if the logged-in user is not a super admin
         if (auth()->user()->role_id != UserRole::SUPER_ADMIN_ROLE) {
-            $query = $query->where('role_id', '!=', UserRole::SUPER_ADMIN_ROLE);
+            $query->where('role_id', '!=', UserRole::SUPER_ADMIN_ROLE);
         }
 
-        // Return the view with the users data
-        return view('/backend.user.users', ['users' => $query]);
+
+        // Order by latest and get results
+        $users = $query->latest()->get(); // equivalent to orderBy('created_at', 'desc')
+
+//        echo "<pre>";
+//        print_r($users->toArray());
+//        exit();
+
+        return view('/backend.user.users', ['users' => $users]);
     }
+
 
 
     /**
